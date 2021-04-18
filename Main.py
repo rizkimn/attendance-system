@@ -1,3 +1,4 @@
+from os.path import isdir
 import cv2, os
 
 faceCascade = cv2.CascadeClassifier('classifiers/haarcascade_frontalface_default.xml')
