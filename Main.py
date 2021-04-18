@@ -1,17 +1,22 @@
 from os.path import isdir
-import cv2, os
+from PIL import Image
+import cv2, os, numpy as np
 
 faceCascade = cv2.CascadeClassifier('classifiers/haarcascade_frontalface_default.xml')
+lbphAlgo = cv2.face.LBPHFaceRecognizer_create()
+
 cap = cv2.VideoCapture(0)
 
 name = input("Type your name : ")
 faceID = input("Type your ID Number : ")
 
-dataPath = 'dataset/' + ''.join(name.split(' ')).lower()
+dataPath = 'dataset/' + '-'.join(name.split(' ')).lower()
 datasetLimit = 50
 
 generateMode = False
 generateIndex = 1
+
+trainMode = False
 while True:
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)
@@ -25,6 +30,7 @@ while True:
     cv2.imshow("Testing", frame)
 
     if generateIndex >= datasetLimit:
+        trainMode = True
         print("| Done | Dataset Generated!")
         break
     if generateMode:
