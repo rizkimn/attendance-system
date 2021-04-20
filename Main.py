@@ -3,7 +3,7 @@ from PIL import Image
 import cv2, os, numpy as np
 
 faceCascade = cv2.CascadeClassifier('classifiers/haarcascade_frontalface_default.xml')
-lbphAlgo = cv2.face.LBPHFaceRecognizer_create()
+recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 cap = cv2.VideoCapture(0)
 
@@ -17,6 +17,7 @@ generateMode = False
 generateIndex = 1
 
 trainMode = False
+
 while True:
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)
@@ -29,10 +30,17 @@ while True:
 
     cv2.imshow("Testing", frame)
 
-    if generateIndex >= datasetLimit:
+    # Limit Dataset
+    if generateIndex > datasetLimit:
         trainMode = True
+
+        print("==========================================")
         print("| Done | Dataset Generated!")
+        print("==========================================")
+
         break
+
+    # Generate Dataset
     if generateMode:
         if not isdir(dataPath):
             os.mkdir(dataPath)
@@ -49,3 +57,48 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
+print('\n')
+
+
+# Train Dataset
+if trainMode:
+    print("| WAIT | Dataset Training ...")
+
+    def getSample():
+        users = []
+        images = []
+
+        for name in os.listdir('dataset'):
+            users.append(name)
+
+        for user in users:
+            for img in os.listdir('dataset/{}'.format(user)):
+                imgPath = os.path.join('dataset/{}'.format(user), img)
+                images.append(imgPath)
+
+        faceSamples = []
+        faceIDs = []
+
+        for imgPath in images:
+            imgPIL = Image.open(imgPath).convert('L')
+            sampleImg = np.array(imgPIL, 'uint8')
+            faceID = int(os.path.split(imgPath)[-1].split('-')[1])
+
+            faces = faceCascade.detectMultiScale(sampleImg)
+            for (x,y,w,h) in faces:
+                faceSamples.append(sampleImg[y:y+h, x:x+w])
+                faceIDs.append(faceID)
+
+        faceIDs = np.array(faceIDs)
+
+        return faceSamples, faceIDs
+
+    faceSample, faceId = getSample()
+
+    recognizer.train(faceSample, faceId)
+    recognizer.save('classifiers/trained_classifier.xml')
+
+    print("==========================================")
+    print("| DONE | Dataset Trained !")
+    print("==========================================")
