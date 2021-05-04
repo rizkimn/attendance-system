@@ -77,7 +77,7 @@ if trainMode:
                 images.append(imgPath)
 
         faceSamples = []
-        faceIDs = []
+        faceIDs = [] 
 
         for imgPath in images:
             imgPIL = Image.open(imgPath).convert('L')

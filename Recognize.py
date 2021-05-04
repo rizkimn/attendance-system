@@ -6,7 +6,7 @@ faceCascade = cv2.CascadeClassifier("classifiers/haarcascade_frontalface_default
 trainCascade = cv2.face.LBPHFaceRecognizer_create()
 trainCascade.read("classifiers/trained_classifier.xml")
 
-names = []
+names = [] 
 
 for user in os.listdir("dataset"):
     name = user.split("-")
