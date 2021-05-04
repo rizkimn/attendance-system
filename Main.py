@@ -63,9 +63,8 @@ print('\n')
 
 # Train Dataset
 if trainMode:
-    print("| WAIT | Dataset Training ...")
-
     def getSample():
+        print("| WAIT | Collecting Dataset ...")
         users = []
         images = []
 
@@ -91,11 +90,13 @@ if trainMode:
                 faceIDs.append(faceID)
 
         faceIDs = np.array(faceIDs)
+        print("| DONE | Dataset Collected !")
 
         return faceSamples, faceIDs
 
     faceSample, faceId = getSample()
 
+    print("| WAIT | Dataset Training ...")
     recognizer.train(faceSample, faceId)
     recognizer.save('classifiers/trained_classifier.xml')
 
